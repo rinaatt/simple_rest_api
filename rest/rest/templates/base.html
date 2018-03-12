@@ -1,0 +1,31 @@
+<!doctype html>{% load static %}
+<html lang="ru"><head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    {% block html_head %}{% endblock %}
+    <title>{% block title %}Tex Parser{% endblock %}</title>
+</head><body>
+    {% block html_body %}{% endblock %}
+    <div id="scripts" hidden="hidden">
+        <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+        <script src="{% static 'js/jquery.cookie.js' %}"></script>
+        {% verbatim %}<script>
+            (function ($) {
+                "use strict";
+                function csrfSafeMethod(method) {
+                    // these HTTP methods do not require CSRF protection
+                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                }
+                $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+                    if (!csrfSafeMethod(options.method) && !options.crossDomain) {
+                        options.headers = {
+                            'X-CSRFToken': $.cookie('csrftoken')
+                        };
+                    }
+                });
+            })(jQuery);
+        </script>{% endverbatim %}
+        {% block scripts %}{% endblock %}
+    </div>
+</body></html>

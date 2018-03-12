@@ -1,0 +1,63 @@
+version: "3"
+
+volumes:
+  static:
+  db_django:
+
+networks:
+  net:
+    driver: bridge
+
+services:
+  postgres:
+    # restart: always
+    image: postgres:10-alpine
+    volumes:
+      - db_django:/var/lib/postgresql/data
+      - ./docker/postgres/opt:/var/opt
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - net
+    expose:
+      - "5432"
+    env_file: .env
+    entrypoint: /var/opt/entrypoint.sh
+  redis:
+    build:
+      context: ./docker/redis
+    networks:
+      - net
+    hostname: redis
+    expose:
+      - "6379"
+  rest:
+    build:
+      context: ./docker/rest/
+    expose:
+      - "8000"
+    env_file:
+      - .env
+    working_dir: /var/rest
+    volumes:
+      - ./rest:/var/rest
+      - static:/var/rest/public/static
+    networks:
+      - net
+    depends_on:
+      - redis
+      - postgres
+    command: ./run.sh
+  nginx:
+    domainname: "simple-rest.local"
+    # restart: always
+    build:
+      context: ./docker/nginx/
+    ports:
+      - "8001:80"
+    volumes:
+      - ./rest/public:/var/www:ro
+      - static:/var/www/static:ro
+    networks:
+      - net
+    depends_on:
+      - rest

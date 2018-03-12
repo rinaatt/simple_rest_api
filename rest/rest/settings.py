@@ -20,7 +20,6 @@ env = environ.Env(DEBUG=(bool, False), )
 # environ.Env.read_env()
 
 BASE_DIR: str = root()
-sys.path.insert(0, root('apps'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'apps.common',
 ]
 
 MIDDLEWARE = [

@@ -1,2 +1,2 @@
-# simple_rest_api
-Python 3 / Django, REST framework
+# Пример простого REST API
+Технологии: Python 3 / Django, REST framework

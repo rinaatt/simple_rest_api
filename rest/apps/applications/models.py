@@ -22,7 +22,7 @@ class Application(models.Model):
 
     class Meta:
         verbose_name = 'Заявка в кредитную организацию'
-        verbose_name_plural = 'Заявки в кредитную организации'
+        verbose_name_plural = 'Заявки в кредитные организации'
 
     def __str__(self):
         return

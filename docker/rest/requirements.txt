@@ -2,6 +2,7 @@ setuptools
 psycopg2>=2.7,<2.8 --no-binary psycopg2
 redis==2.10.6
 hiredis==0.2.0
+mimesis==2.0.0
 Django==2.0.2
 django-environ==0.4.4
 django-redis==4.8.0

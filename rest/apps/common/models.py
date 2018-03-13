@@ -17,9 +17,11 @@ class Organization(models.Model):
         from mimesis import Business
         business = Business(locale)
         Organization.objects.all().delete()
-        objs = (Organization(name=business.company()) for _ in range(count))
+        organizations_gen = (
+            Organization(name=business.company()) for _ in range(count)
+        )
         while True:
-            batch = list(islice(objs, batch_size))
+            batch = list(islice(organizations_gen, batch_size))
             if not batch:
                 break
             Organization.objects.bulk_create(batch, batch_size)

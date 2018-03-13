@@ -1,5 +1,28 @@
+from random import randint, choice
+from mimesis import Text, Datetime, Business
+from pytz import UTC
 from itertools import islice
 from django.db import models
+
+
+def _generate_offer_data(locale='ru'):
+    text = Text(locale)
+    datetime = Datetime(locale)
+    typ_choice = [Offer.CONSUMER, Offer.MORTGAGE, Offer.AUTO, Offer.CSMB]
+
+    def rand_dt():
+        _dt = datetime.datetime(start=2016, end=2018)
+        return _dt.replace(tzinfo=UTC)
+
+    def rand_txt(quantity=10):
+        return ' '.join(text.words(quantity=quantity))
+
+    return dict(rotation_start=rand_dt(),
+                rotation_finish=rand_dt(),
+                name=rand_txt(),
+                typ=choice(typ_choice),
+                min_score=randint(0, 1000),
+                max_score=randint(500, 2000))
 
 
 class Organization(models.Model):
@@ -14,7 +37,6 @@ class Organization(models.Model):
 
     @staticmethod
     def _bootstrap(count=500, locale='ru', batch_size=100):
-        from mimesis import Business
         business = Business(locale)
         Organization.objects.all().delete()
         organizations_gen = (
@@ -57,34 +79,13 @@ class Offer(models.Model):
 
     @staticmethod
     def _bootstrap(count=10000, locale='ru', batch_size=100):
-        from random import randint, choice
-        from mimesis import Text, Datetime
-        from pytz import UTC
-        text = Text(locale)
-        datetime = Datetime(locale)
-        typ_choice = [Offer.CONSUMER, Offer.MORTGAGE, Offer.AUTO, Offer.CSMB]
-
-        def rand_dt():
-            _dt = datetime.datetime(start=2016, end=2018)
-            return _dt.replace(tzinfo=UTC)
-
-        def rand_txt(quantity=10):
-            return ' '.join(text.words(quantity=quantity))
-
         Offer.objects.all().delete()
         if not Organization.objects.exists():
             Organization._bootstrap()
         organizations_id = Organization.objects.values_list('pk', flat=True)
-        offers_gen = (
-            Offer(rotation_start=rand_dt(),
-                  rotation_finish=rand_dt(),
-                  name=rand_txt(),
-                  typ=choice(typ_choice),
-                  min_score=randint(0, 1000),
-                  max_score=randint(500, 2000),
-                  organization_id=choice(organizations_id))
-            for _ in range(count)
-        )
+        offers_gen = (Offer(organization_id=choice(organizations_id),
+                            **_generate_offer_data(locale))
+                      for _ in range(count))
         while True:
             batch = list(islice(offers_gen, batch_size))
             if not batch:

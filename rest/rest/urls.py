@@ -17,9 +17,11 @@ from django.urls import include, path, re_path
 from django.contrib.admin import site as admin_site
 from rest_framework import routers
 from apps.common.views import OrganizationViewSet
+from apps.worksheets.views import WorksheetViewSet
 
 router = routers.DefaultRouter()
 router.register(r'organizations', OrganizationViewSet)
+router.register(r'worksheets', WorksheetViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

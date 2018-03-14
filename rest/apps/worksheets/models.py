@@ -53,6 +53,17 @@ class Worksheet(models.Model):
     def passport(self):
         return '{} {}'.format(self.pass_ser, self.pass_num)
 
+    @passport.setter
+    def passport(self, value):
+        val = str(value).replace(' ', '')
+        self.pass_ser = '{} {}'.format(val[0:2], val[2:4])
+        self.pass_num = val[4:]
+
+    @passport.deleter
+    def passport(self):
+        self.pass_ser = None
+        self.pass_num = None
+
     def __str__(self):
         return self.full_name
 

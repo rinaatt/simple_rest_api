@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 parse_url() {
     # extract the protocol
@@ -34,6 +33,3 @@ parse_url() {
     export DB_SERVICE="$host"
     export DB_PORT="$port"
 }
-
-export -f parse_url
-. /docker-entrypoint.sh postgres

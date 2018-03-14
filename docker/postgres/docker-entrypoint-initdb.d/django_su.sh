@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+psql -U postgres -c "CREATE USER $DATABASE_SU_USERNAME SUPERUSER PASSWORD '$DATABASE_SU_PASSWORD'"

@@ -4,6 +4,7 @@ from mimesis import Person, Datetime
 from mimesis.builtins import RussiaSpecProvider
 from mimesis.enums import Gender
 from django.db import models
+from django.contrib.postgres.functions import RandomUUID
 
 
 def _generate_worksheet_data(locale='ru'):
@@ -24,6 +25,7 @@ def _generate_worksheet_data(locale='ru'):
 
 
 class Worksheet(models.Model):
+    id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     created = models.DateTimeField('Создано', auto_now_add=True)
     updated = models.DateTimeField('Изменено', auto_now=True)
     surname = models.CharField('Фамилия', max_length=100)

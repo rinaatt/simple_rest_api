@@ -3,6 +3,7 @@ from mimesis import Text, Datetime, Business
 from pytz import UTC
 from itertools import islice
 from django.db import models
+from django.contrib.postgres.functions import RandomUUID
 
 
 def _generate_offer_data(locale='ru'):
@@ -26,6 +27,7 @@ def _generate_offer_data(locale='ru'):
 
 
 class Organization(models.Model):
+    id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     name = models.CharField(max_length=200)
 
     class Meta:
@@ -60,6 +62,7 @@ class Offer(models.Model):
         (AUTO, 'автокредит'),
         (CSMB, 'КМСБ'),
     )
+    id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     created = models.DateTimeField('Создано', auto_now_add=True)
     updated = models.DateTimeField('Изменено', auto_now=True)
     rotation_start = models.DateTimeField('Начало ротации', null=True, blank=True)

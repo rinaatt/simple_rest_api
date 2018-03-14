@@ -14,9 +14,9 @@ class Command(BaseCommand):
         'worksheet': Worksheet,
     }
     default_count = {
-        'organization': 500,
-        'offer': 10000,
-        'worksheet': 100000,
+        'organization': 100,
+        'offer': 1000,
+        'worksheet': 10000,
     }
 
     def add_arguments(self, parser):

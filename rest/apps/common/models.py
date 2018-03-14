@@ -1,6 +1,6 @@
 from random import randint, choice
 from mimesis import Text, Datetime, Business
-from pytz import UTC
+from pytz import utc
 from itertools import islice
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
@@ -13,7 +13,7 @@ def _generate_offer_data(locale='ru'):
 
     def rand_dt():
         _dt = datetime.datetime(start=2016, end=2018)
-        return _dt.replace(tzinfo=UTC)
+        return _dt.replace(tzinfo=utc)
 
     def rand_txt(quantity=10):
         return ' '.join(text.words(quantity=quantity))
@@ -38,7 +38,7 @@ class Organization(models.Model):
         return self.name
 
     @staticmethod
-    def _bootstrap(count=500, locale='ru', batch_size=100):
+    def _bootstrap(count=100, locale='ru', batch_size=100):
         business = Business(locale)
         Organization.objects.all().delete()
         organizations_gen = (
@@ -81,7 +81,7 @@ class Offer(models.Model):
         return self.name
 
     @staticmethod
-    def _bootstrap(count=10000, locale='ru', batch_size=100):
+    def _bootstrap(count=1000, locale='ru', batch_size=100):
         Offer.objects.all().delete()
         if not Organization.objects.exists():
             Organization._bootstrap()
@@ -94,3 +94,9 @@ class Offer(models.Model):
             if not batch:
                 break
             Offer.objects.bulk_create(batch, batch_size)
+
+
+__all__ = [
+    'Organization',
+    'Offer',
+]

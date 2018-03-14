@@ -4,7 +4,9 @@ from mimesis import Person, Datetime
 from mimesis.builtins import RussiaSpecProvider
 from mimesis.enums import Gender
 from django.db import models
+from django.utils import timezone
 from django.contrib.postgres.functions import RandomUUID
+from pytz import utc
 
 
 def _generate_worksheet_data(locale='ru'):
@@ -12,7 +14,9 @@ def _generate_worksheet_data(locale='ru'):
     rus_spec = RussiaSpecProvider()
     datetime = Datetime(locale)
     g = choice([Gender.FEMALE, Gender.MALE])
+    created = datetime.datetime(start=2015, end=2018)
     return {
+        'created': created.replace(tzinfo=utc),
         'surname': person.surname(gender=g),
         'first_name': person.name(gender=g),
         'patronymic': rus_spec.patronymic(gender=g),
@@ -26,7 +30,7 @@ def _generate_worksheet_data(locale='ru'):
 
 class Worksheet(models.Model):
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
-    created = models.DateTimeField('Создано', auto_now_add=True)
+    created = models.DateTimeField('Создано', blank=True, default=timezone.now)
     updated = models.DateTimeField('Изменено', auto_now=True)
     surname = models.CharField('Фамилия', max_length=100)
     first_name = models.CharField('Имя', max_length=100)
@@ -53,7 +57,7 @@ class Worksheet(models.Model):
         return self.full_name
 
     @staticmethod
-    def _bootstrap(count=100000, locale='ru', batch_size=100):
+    def _bootstrap(count=10000, locale='ru', batch_size=100):
         Worksheet.objects.all().delete()
         worksheets_gen = (Worksheet(**_generate_worksheet_data(locale))
                           for _ in range(count))

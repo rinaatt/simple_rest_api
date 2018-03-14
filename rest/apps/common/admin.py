@@ -10,4 +10,5 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(m.Offer)
 class OfferAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('created', 'name', )
+    list_display_links = ('name', )

@@ -1,3 +1,4 @@
+import uuid
 from random import randint, choice
 from mimesis import Text, Datetime, Business
 from pytz import utc
@@ -11,6 +12,8 @@ def _generate_offer_data(locale='ru'):
     datetime = Datetime(locale)
     typ_choice = [Offer.CONSUMER, Offer.MORTGAGE, Offer.AUTO, Offer.CSMB]
 
+    created = datetime.datetime(start=2015, end=2018)
+
     def rand_dt():
         _dt = datetime.datetime(start=2016, end=2018)
         return _dt.replace(tzinfo=utc)
@@ -18,7 +21,10 @@ def _generate_offer_data(locale='ru'):
     def rand_txt(quantity=10):
         return ' '.join(text.words(quantity=quantity))
 
-    return dict(rotation_start=rand_dt(),
+    return dict(id=uuid.uuid4(),
+                created=created.replace(tzinfo=utc),
+                updated=created.replace(tzinfo=utc),
+                rotation_start=rand_dt(),
                 rotation_finish=rand_dt(),
                 name=rand_txt(),
                 typ=choice(typ_choice),

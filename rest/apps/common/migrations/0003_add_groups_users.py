@@ -71,7 +71,7 @@ def del_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0002_auto_20180314_1238'),
+        ('common', '0002_create_offer_organization_models'),
     ]
 
     operations = [

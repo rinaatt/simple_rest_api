@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('worksheets', '0001_initial'),
-        ('common', '0002_auto_20180314_1238'),
+        ('common', '0002_create_offer_organization_models'),
     ]
 
     operations = [

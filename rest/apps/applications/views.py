@@ -1,6 +1,8 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from .models import Application
 from .serializers import ApplicationSerializer
+
+permissions.BasePermission()
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):

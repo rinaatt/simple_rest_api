@@ -1,35 +1,5 @@
-import uuid
-from random import randint, choice
-from mimesis import Text, Datetime, Business
-from pytz import utc
-from itertools import islice
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
-
-
-def _generate_offer_data(locale='ru'):
-    text = Text(locale)
-    datetime = Datetime(locale)
-    typ_choice = [Offer.CONSUMER, Offer.MORTGAGE, Offer.AUTO, Offer.CSMB]
-
-    created = datetime.datetime(start=2015, end=2018)
-
-    def rand_dt():
-        _dt = datetime.datetime(start=2016, end=2018)
-        return _dt.replace(tzinfo=utc)
-
-    def rand_txt(quantity=10):
-        return ' '.join(text.words(quantity=quantity))
-
-    return dict(id=uuid.uuid4(),
-                created=created.replace(tzinfo=utc),
-                updated=created.replace(tzinfo=utc),
-                rotation_start=rand_dt(),
-                rotation_finish=rand_dt(),
-                name=rand_txt(),
-                typ=choice(typ_choice),
-                min_score=randint(0, 1000),
-                max_score=randint(500, 2000))
 
 
 class Organization(models.Model):
@@ -42,19 +12,6 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
-
-    @staticmethod
-    def _bootstrap(count=100, locale='ru', batch_size=100):
-        business = Business(locale)
-        Organization.objects.all().delete()
-        organizations_gen = (
-            Organization(name=business.company()) for _ in range(count)
-        )
-        while True:
-            batch = list(islice(organizations_gen, batch_size))
-            if not batch:
-                break
-            Organization.objects.bulk_create(batch, batch_size)
 
 
 class Offer(models.Model):
@@ -85,21 +42,6 @@ class Offer(models.Model):
 
     def __str__(self):
         return self.name
-
-    @staticmethod
-    def _bootstrap(count=1000, locale='ru', batch_size=100):
-        Offer.objects.all().delete()
-        if not Organization.objects.exists():
-            Organization._bootstrap()
-        organizations_id = Organization.objects.values_list('pk', flat=True)
-        offers_gen = (Offer(organization_id=choice(organizations_id),
-                            **_generate_offer_data(locale))
-                      for _ in range(count))
-        while True:
-            batch = list(islice(offers_gen, batch_size))
-            if not batch:
-                break
-            Offer.objects.bulk_create(batch, batch_size)
 
 
 __all__ = [

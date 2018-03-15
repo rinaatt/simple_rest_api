@@ -16,13 +16,10 @@ Including another URLconf
 from django.urls import include, path, re_path
 from django.contrib.admin import site as admin_site
 from rest_framework import routers
-from apps.common.views import OrganizationViewSet, OfferViewSet
 from apps.worksheets.views import WorksheetViewSet
 from apps.applications.views import ApplicationViewSet
 
 router = routers.DefaultRouter()
-router.register(r'organizations', OrganizationViewSet)
-router.register(r'offers', OfferViewSet)
 router.register(r'worksheets', WorksheetViewSet)
 router.register(r'applications', ApplicationViewSet)
 

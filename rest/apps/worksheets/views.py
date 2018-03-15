@@ -2,6 +2,7 @@ import logging
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
+from apps.common.permissions import DjangoModelPermissionsWithRead
 from .models import Worksheet
 from .serializers import WorksheetSerializer
 
@@ -35,3 +36,4 @@ class WorksheetViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, )
     search_fields = ('surname', 'first_name', 'patronymic', 'phone_num')
     filter_class = WorksheetFilter
+    permission_classes = (DjangoModelPermissionsWithRead, )

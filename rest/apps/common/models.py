@@ -20,9 +20,9 @@ class Offer(models.Model):
     AUTO = 'A'
     CSMB = 'B'
     TYPE_CHOICES = (
-        (CONSUMER, 'потреб'),
-        (MORTGAGE, 'ипотека'),
-        (AUTO, 'автокредит'),
+        (CONSUMER, 'Потребительский'),
+        (MORTGAGE, 'Ипотечный'),
+        (AUTO, 'Автокредит'),
         (CSMB, 'КМСБ'),
     )
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
@@ -42,6 +42,10 @@ class Offer(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def type(self):
+        return self.get_typ_display()
 
 
 __all__ = [

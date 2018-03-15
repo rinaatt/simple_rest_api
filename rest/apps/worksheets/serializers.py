@@ -3,7 +3,7 @@ from .models import Worksheet
 
 
 class WorksheetSerializer(serializers.HyperlinkedModelSerializer):
-    passport = serializers.CharField(max_length=12, label='Пасспорт')
+    passport = serializers.CharField(max_length=12, label='Паспорт')
 
     class Meta:
         model = Worksheet

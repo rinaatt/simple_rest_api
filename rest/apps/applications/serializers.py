@@ -3,6 +3,8 @@ from .models import Application
 
 
 class ApplicationSerializer(serializers.HyperlinkedModelSerializer):
+    offer = serializers.StringRelatedField()
+    worksheet = serializers.StringRelatedField()
 
     class Meta:
         model = Application

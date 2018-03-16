@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
+from django.contrib.auth.models import User
 
 
 class Organization(models.Model):
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     name = models.CharField(max_length=200)
+    user = models.OneToOneField(User, models.CASCADE, null=True)
 
     class Meta:
         verbose_name = 'Кредитная организация'
@@ -34,7 +36,8 @@ class Offer(models.Model):
     typ = models.CharField('Тип', max_length=1, choices=TYPE_CHOICES, default=CONSUMER)
     min_score = models.IntegerField('Минимальный балл', default=0, blank=True)
     max_score = models.IntegerField('Максимальный балл', null=True, blank=True)
-    organization = models.ForeignKey(Organization, verbose_name='Кредитная организация', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, models.CASCADE,
+                                     verbose_name='Кредитная организация')
 
     class Meta:
         verbose_name = 'Предложение'

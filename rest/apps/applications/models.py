@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
+from django.contrib.auth.models import User
 from apps.worksheets.models import Worksheet
 from apps.common.models import Offer
 
@@ -17,9 +18,10 @@ class Application(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     created = models.DateTimeField('Создано', auto_now_add=True)
+    owner = models.ForeignKey(User, models.CASCADE, verbose_name='Создатель', null=True)
     sent = models.DateTimeField('Отправлено', null=True, blank=True)
-    worksheet = models.ForeignKey(Worksheet, verbose_name='Анкета клиента', on_delete=models.CASCADE)
-    offer = models.ForeignKey(Offer, verbose_name='Предложение', on_delete=models.CASCADE)
+    worksheet = models.ForeignKey(Worksheet, models.CASCADE, verbose_name='Анкета клиента')
+    offer = models.ForeignKey(Offer, models.CASCADE, verbose_name='Предложение')
     status = models.CharField('Статус', max_length=1, choices=STATUS_CHOICES, default=NEW)
 
     class Meta:

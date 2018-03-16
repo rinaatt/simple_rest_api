@@ -1,5 +1,6 @@
 import logging
 from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
 from apps.common.permissions import DjangoModelPermissionsWithRead
@@ -22,6 +23,22 @@ class WorksheetFilter(filters.FilterSet):
                                      label='Минимальный скоринговый балл')
     max_score = filters.NumberFilter(name='score', lookup_expr='lte',
                                      label='Максимальный скоринговый балл')
+    order = filters.OrderingFilter(
+        fields=(
+            ('surname', 'surname'),
+            ('first_name', 'name'),
+            ('birth_date', 'birth'),
+            ('score', 'score'),
+            ('created', 'created'),
+        ),
+        field_labels={
+            'surname': 'По фамилии',
+            'first_name': 'По имени',
+            'birth_date': 'По дате рождения',
+            'score': 'По скоринговому баллу',
+            'created': 'По дате создания анкеты',
+        }
+    )
 
     class Meta:
         model = Worksheet
@@ -31,9 +48,9 @@ class WorksheetFilter(filters.FilterSet):
 
 
 class WorksheetViewSet(viewsets.ModelViewSet):
-    queryset = Worksheet.objects.all().order_by('created')
     serializer_class = WorksheetSerializer
-    filter_backends = (filters.DjangoFilterBackend, SearchFilter, )
-    search_fields = ('surname', 'first_name', 'patronymic', 'phone_num')
+    queryset = Worksheet.objects.all()
+    # search_fields = ('surname', 'first_name', 'patronymic', 'phone_num')
+    ordering = ('created', )
     filter_class = WorksheetFilter
     permission_classes = (DjangoModelPermissionsWithRead, )

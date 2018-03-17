@@ -4,9 +4,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.apps.registry import Apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission, Group
-
-CREDITS_G_NAME = 'Кредитные организации'
-PARTNERS_G_NAME = 'Партнёры'
+from apps.common.constants import GROUP_CREDITS, GROUP_PARTNERS
 
 
 def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
@@ -66,7 +64,7 @@ def add_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 def del_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
-    for g_name in [CREDITS_G_NAME, PARTNERS_G_NAME]:
+    for g_name in [GROUP_CREDITS, GROUP_PARTNERS]:
         try:
             Group.objects.get(name=g_name).delete()
         except Group.DoesNotExist:
@@ -77,6 +75,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('common', '0003_model_offer'),
         ('applications', '0001_initial'),
         ('worksheets', '0001_initial'),
     ]

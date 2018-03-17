@@ -13,3 +13,5 @@ class DjangoModelPermissionsWithRead(permissions.DjangoModelPermissions):
     }
 
 
+class IsOwnerOrDjangoModelPermissions(permissions.DjangoModelPermissions):
+    pass

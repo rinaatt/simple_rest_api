@@ -15,7 +15,7 @@ class Worksheet(models.Model):
     pass_ser = models.CharField('Серия паспорта', max_length=5)
     pass_num = models.CharField('Номер паспорта', max_length=6)
     score = models.IntegerField('Скоринговый балл', blank=True, null=True)
-    owner = models.ForeignKey(User, models.CASCADE, verbose_name='Создатель', null=True)
+    owner = models.ForeignKey(User, models.CASCADE, verbose_name='Партнёр', null=True)
 
     class Meta:
         verbose_name = 'Анкета клиента'

@@ -1,13 +1,18 @@
 from pytz import utc
 import uuid
+from itertools import chain
+from string import ascii_letters, digits
 from random import randint, choice
 from mimesis import Text, Datetime, Business, Person
 from mimesis.builtins import RussiaSpecProvider
 from mimesis.enums import Gender
+from mimesis.helpers import get_random_item
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Model
 from django.db import connection, transaction
+from django.contrib.auth.models import User, Group
 from apps.common.models import Organization, Offer
+from apps.common.constants import GROUP_PARTNERS, GROUP_CREDITS
 from apps.worksheets.models import Worksheet
 
 
@@ -22,38 +27,63 @@ def _generate_offer_data(locale='ru') -> dict:
         _dt = datetime.datetime(start=2017, end=2018)
         return _dt.replace(tzinfo=utc)
 
-    return dict(id=uuid.uuid4(),
-                created=created.replace(tzinfo=utc),
-                updated=created.replace(tzinfo=utc),
-                rotation_start=rand_dt(),
-                rotation_finish=rand_dt(),
-                name=' '.join(text.words(quantity=10)),
-                typ=choice(typ_choice),
-                min_score=_score,
-                max_score=_score + randint(300, 1000))
+    return {
+        'id': uuid.uuid4(),
+        'created': created.replace(tzinfo=utc),
+        'updated': created.replace(tzinfo=utc),
+        'rotation_start': rand_dt(),
+        'rotation_finish': rand_dt(),
+        'name': ' '.join(text.words(quantity=10)),
+        'typ': choice(typ_choice),
+        'min_score': _score,
+        'max_score': _score + randint(300, 1000),
+    }
 
 
 def _generate_organization_data(locale='ru') -> dict:
     business = Business(locale)
-    return dict(id=uuid.uuid4(), name=business.company())
+    return {
+        'id': uuid.uuid4(),
+        'name': business.company(),
+    }
 
 
 def _generate_worksheet_data(locale='ru') -> dict:
     person = Person(locale)
     rus_spec = RussiaSpecProvider()
     datetime = Datetime(locale)
-    g = choice([Gender.FEMALE, Gender.MALE])
+    g = get_random_item(Gender)
     created = datetime.datetime(start=2015, end=2018)
-    return dict(created=created.replace(tzinfo=utc),
-                updated=created.replace(tzinfo=utc),
-                surname=person.surname(gender=g),
-                first_name=person.name(gender=g),
-                patronymic=rus_spec.patronymic(gender=g),
-                birth_date=datetime.datetime(start=1960, end=1998).date(),
-                phone_num=person.telephone(),
-                pass_ser=rus_spec.passport_series(),
-                pass_num=rus_spec.passport_number(),
-                score=randint(0, 2000))
+    return {
+        'id': uuid.uuid4(),
+        'created': created.replace(tzinfo=utc),
+        'updated': created.replace(tzinfo=utc),
+        'surname': person.surname(gender=g),
+        'first_name': person.name(gender=g),
+        'patronymic': rus_spec.patronymic(gender=g),
+        'birth_date': datetime.datetime(start=1960, end=1998).date(),
+        'phone_num': person.telephone(),
+        'pass_ser': rus_spec.passport_series(),
+        'pass_num': rus_spec.passport_number(),
+        'score': randint(0, 2000),
+    }
+
+
+def _generate_password(length: int = 10) -> str:
+    return ''.join(choice(ascii_letters + digits) for _ in range(length))
+
+
+def _generate_user_data(locale='ru'):
+    person = Person(locale)
+    date = Datetime(locale)
+    gender = get_random_item(Gender)
+    return {
+        'password': _generate_password(),
+        'first_name': person.surname(gender=gender),
+        'last_name': person.name(gender=gender),
+        'email': person.email(),
+        'date_joined': date.datetime(start=2014, end=2015).replace(tzinfo=utc),
+    }
 
 
 @transaction.atomic
@@ -71,24 +101,36 @@ def insert(tab_name: str, data_dict: dict):
         cursor.execute(sql, values)
 
 
+class NoDataException(Exception):
+    pass
+
+
 class Command(BaseCommand):
     help = """\
         Generate fake data, by default it generate for
         models: [organization, offer, worksheet]
     """
     model = {
+        'user': User,
         'organization': Organization,
         'offer': Offer,
         'worksheet': Worksheet,
     }
+    ORGANIZATION = 'organization'
+    OFFER = 'offer'
+    WORKSHEET = 'worksheet'
+    USER = 'user'
+    APPLICATION = 'application'
     generate_data = {
-        'organization': _generate_organization_data,
-        'offer': _generate_offer_data,
+        ORGANIZATION: _generate_organization_data,
+        OFFER: _generate_offer_data,
+        WORKSHEET: _generate_worksheet_data,
+        USER: _generate_user_data,
     }
     default_count = {
-        'organization': 100,
-        'offer': 1000,
-        'worksheet': 10000,
+        ORGANIZATION: 50,
+        OFFER: 400,
+        WORKSHEET: 2000,
     }
 
     def add_arguments(self, parser):
@@ -109,7 +151,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         model_name = options['model']
         if not model_name:
-            models_list = ['organization', 'offer', 'worksheet']
+            models_list = [self.USER,
+                           self.ORGANIZATION,
+                           self.OFFER,
+                           self.WORKSHEET]
         else:
             models_list = [model_name.lower()]
         for _name in models_list:
@@ -117,14 +162,26 @@ class Command(BaseCommand):
                 continue
             count = options['count']
             if not count:
-                count = self.default_count[_name]
+                count = self.default_count[_name if _name != self.USER
+                                           else self.ORGANIZATION]
             try:
-                self._fill_data(_name, count, options['locale'])
+                if _name == self.USER:
+                    users_1 = self._fill_users('partner{n:02d}', GROUP_PARTNERS,
+                                               10, options['locale'])
+
+                    users_2 = self._fill_users('credit{n:02d}', GROUP_CREDITS,
+                                               count, options['locale'])
+                    with open('fake_users.txt', 'w') as f:
+                        f.writelines('{}:{}\n'.format(k, v)
+                                     for k, v in chain(users_1.items(),
+                                                       users_2.items()))
+                else:
+                    self._fill_data(_name, count, options['locale'])
             except Exception as exc:
                 self.stdout.write(
                     self.style.ERROR('Raised exception for "%s"' % _name)
                 )
-                self.stderr.write(exc)
+                self.stderr.write(str(exc))
             else:
                 self.stdout.write(
                     self.style.SUCCESS(
@@ -132,15 +189,46 @@ class Command(BaseCommand):
                     )
                 )
 
+    def _fill_users(self, username_patt, group_name, count, locale='ru'):
+        generated_users = {}
+        group = Group.objects.get(name=group_name)
+        group.user_set.all().delete()
+        for n in range(1, count+1):
+            _data = self.generate_data['user'](locale)
+            _username = username_patt.format(n=n)
+            generated_users[_username] = _data['password']
+            user = User.objects.create(username=_username, **_data)
+            user.set_password(_data['password'])
+            user.groups.add(group)
+            user.save()
+        return generated_users
+
     def _fill_data(self, model_name, count, locale='ru'):
         ModelKlass: type(Model) = self.model[model_name]
         ModelKlass.objects.all().delete()
         db_table = ModelKlass._meta.db_table
-        organizations_id = []
-        if model_name == 'offer':
+        organizations_id, users_id = [], []
+        if model_name in (self.APPLICATION, self.WORKSHEET):
+            users_id = list(User.objects
+                            .filter(groups__name=GROUP_PARTNERS)
+                            .values_list('pk', flat=True))
+            if not users_id:
+                raise NoDataException('Generate users first!')
+        elif model_name == self.ORGANIZATION:
+            users_id = list(User.objects
+                            .filter(groups__name=GROUP_CREDITS)
+                            .values_list('pk', flat=True))
+            if not users_id:
+                raise NoDataException('Generate users first!')
+        if model_name == self.OFFER:
             organizations_id = Organization.objects.values_list('pk', flat=True)
         for _ in range(count):
             _data = self.generate_data[model_name](locale)
-            if model_name == 'offer':
+            if model_name == self.OFFER:
                 _data['organization_id'] = choice(organizations_id)
+            if model_name in (self.APPLICATION, self.WORKSHEET):
+                _data['owner_id'] = choice(users_id)
+            elif model_name == self.ORGANIZATION:
+                _data['user_id'] = choice(users_id)
+                users_id.remove(_data['user_id'])
             insert(db_table, _data)

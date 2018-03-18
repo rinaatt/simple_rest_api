@@ -11,9 +11,9 @@ from django.core.management.base import BaseCommand
 from django.db.models import Model
 from django.db import connection, transaction
 from django.contrib.auth.models import User, Group
-from apps.credits.models import Organization, Offer
+from apps.credits.models import Offer, Organization as CreditOrganization
 from apps.common.constants import GROUP_PARTNERS, GROUP_CREDITS
-from apps.partners.models import Questionnaire
+from apps.partners.models import Questionnaire, Organization as PartnerOrganization
 
 
 def _generate_offer_data(locale='ru') -> dict:
@@ -112,25 +112,29 @@ class Command(BaseCommand):
     """
     model = {
         'user': User,
-        'organization': Organization,
+        'credit_organization': CreditOrganization,
+        'partner_organization': PartnerOrganization,
         'offer': Offer,
         'questionnaire': Questionnaire,
     }
-    ORGANIZATION = 'organization'
+    CREDIT_ORGANIZATION = 'credit_organization'
+    PARTNER_ORGANIZATION = 'partner_organization'
     OFFER = 'offer'
     QUESTIONNAIRE = 'questionnaire'
     USER = 'user'
-    APPLICATION = 'claim'
+    CLAIM = 'claim'
     generate_data = {
-        ORGANIZATION: _generate_organization_data,
+        CREDIT_ORGANIZATION: _generate_organization_data,
+        PARTNER_ORGANIZATION: _generate_organization_data,
         OFFER: _generate_offer_data,
         QUESTIONNAIRE: _generate_questionnaire_data,
         USER: _generate_user_data,
     }
     default_count = {
-        ORGANIZATION: 50,
+        PARTNER_ORGANIZATION: 10,
+        CREDIT_ORGANIZATION: 50,
         OFFER: 400,
-        QUESTIONNAIRE: 2000,
+        QUESTIONNAIRE: 1000,
     }
 
     def add_arguments(self, parser):
@@ -152,7 +156,8 @@ class Command(BaseCommand):
         model_name = options['model']
         if not model_name:
             models_list = [self.USER,
-                           self.ORGANIZATION,
+                           self.PARTNER_ORGANIZATION,
+                           self.CREDIT_ORGANIZATION,
                            self.OFFER,
                            self.QUESTIONNAIRE]
         else:
@@ -162,15 +167,21 @@ class Command(BaseCommand):
                 continue
             count = options['count']
             if not count:
-                count = self.default_count[_name if _name != self.USER
-                                           else self.ORGANIZATION]
+                count = self.default_count.get(_name, None)
             try:
                 if _name == self.USER:
-                    users_1 = self._fill_users('partner{n:02d}', GROUP_PARTNERS,
-                                               10, options['locale'])
-
-                    users_2 = self._fill_users('credit{n:02d}', GROUP_CREDITS,
-                                               count, options['locale'])
+                    users_1 = self._fill_users(
+                        'partner{n:02d}',
+                        GROUP_PARTNERS,
+                        self.default_count[self.PARTNER_ORGANIZATION],
+                        options['locale']
+                    )
+                    users_2 = self._fill_users(
+                        'credit{n:02d}',
+                        GROUP_CREDITS,
+                        self.default_count[self.CREDIT_ORGANIZATION],
+                        options['locale']
+                    )
                     with open('fake_users.txt', 'w') as f:
                         f.writelines('{}:{}\n'.format(k, v)
                                      for k, v in chain(users_1.items(),
@@ -208,27 +219,38 @@ class Command(BaseCommand):
         ModelKlass.objects.all().delete()
         db_table = ModelKlass._meta.db_table
         organizations_id, users_id = [], []
-        if model_name in (self.APPLICATION, self.QUESTIONNAIRE):
+
+        if model_name == self.PARTNER_ORGANIZATION:
             users_id = list(User.objects
                             .filter(groups__name=GROUP_PARTNERS)
                             .values_list('pk', flat=True))
             if not users_id:
                 raise NoDataException('Generate users first!')
-        elif model_name == self.ORGANIZATION:
+        elif model_name == self.CREDIT_ORGANIZATION:
             users_id = list(User.objects
                             .filter(groups__name=GROUP_CREDITS)
                             .values_list('pk', flat=True))
             if not users_id:
                 raise NoDataException('Generate users first!')
+
         if model_name == self.OFFER:
-            organizations_id = Organization.objects.values_list('pk', flat=True)
+            organizations_id = CreditOrganization.objects\
+                .values_list('pk', flat=True)
+        elif model_name in (self.CLAIM, self.QUESTIONNAIRE):
+            organizations_id = PartnerOrganization.objects\
+                .values_list('pk', flat=True)
+
         for _ in range(count):
             _data = self.generate_data[model_name](locale)
-            if model_name == self.OFFER:
+            if model_name in (self.OFFER, self.QUESTIONNAIRE):
                 _data['organization_id'] = choice(organizations_id)
-            if model_name in (self.APPLICATION, self.QUESTIONNAIRE):
-                _data['owner_id'] = choice(users_id)
-            elif model_name == self.ORGANIZATION:
+            if model_name == self.CLAIM:
+                _data['partner_id'] = choice(organizations_id)
+            elif model_name in (self.CREDIT_ORGANIZATION, self.PARTNER_ORGANIZATION):
                 _data['user_id'] = choice(users_id)
+                _data['typ'] = {
+                    self.CREDIT_ORGANIZATION: CreditOrganization.CREDIT,
+                    self.PARTNER_ORGANIZATION: PartnerOrganization.PARTNER,
+                }[model_name]
                 users_id.remove(_data['user_id'])
             insert(db_table, _data)

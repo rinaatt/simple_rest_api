@@ -25,8 +25,8 @@ class Claim(models.Model):
     status = models.CharField('Статус', max_length=1, choices=STATUS_CHOICES, default=NEW)
 
     class Meta:
-        verbose_name = 'Заявка в кредитную организацию'
-        verbose_name_plural = 'Заявки в кредитные организации'
+        verbose_name = 'Заявка'
+        verbose_name_plural = 'Заявки'
 
     def __str__(self):
         return

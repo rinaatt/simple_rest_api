@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Questionnaire
+from apps.questionnaires.models import Questionnaire
+from apps.claims.models import Claim
 
 
 class QuestionnaireSerializer(serializers.HyperlinkedModelSerializer):
@@ -12,3 +13,13 @@ class QuestionnaireSerializer(serializers.HyperlinkedModelSerializer):
                   'patronymic', 'birth_date', 'phone_num', 'passport',
                   'score', 'owner')
         read_only_fields = ('created', 'updated', 'owner')
+
+
+class ClaimSerializer(serializers.ModelSerializer):
+    offer = serializers.StringRelatedField()
+    questionnaire = serializers.StringRelatedField()
+
+    class Meta:
+        model = Claim
+        fields = ('created', 'sent', 'questionnaire', 'offer', 'status')
+        read_only_fields = ('created', 'sent', 'status', )

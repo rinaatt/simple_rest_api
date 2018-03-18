@@ -7,11 +7,12 @@ from django.contrib.auth.models import Permission, Group
 from apps.common.constants import GROUP_CREDITS, GROUP_PARTNERS
 
 
+CLAIM = ('claims', 'Claim')
+QUESTS = ('questionnaires', 'Questionnaire')
+
+
 def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
-    app_model_list = [
-        ('claims', 'Claim'),
-        ('questionnaires', 'Questionnaire')
-    ]
+    app_model_list = [CLAIM, QUESTS]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
         content_type = ContentType.objects.get_for_model(ModelKlass)
@@ -21,10 +22,7 @@ def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
-    app_model_list = [
-        ('claims', 'Claim'),
-        ('questionnaires', 'Questionnaire')
-    ]
+    app_model_list = [CLAIM, QUESTS]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
         content_type = ContentType.objects.get_for_model(ModelKlass)
@@ -38,20 +36,20 @@ def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 def add_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
-    Claim = apps.get_model('claims', 'Claim')
-    Questionnaire = apps.get_model('questionnaires', 'Questionnaire')
-    app_content_type = ContentType.objects.get_for_model(Claim)
-    ws_content_type = ContentType.objects.get_for_model(Questionnaire)
+    Claim = apps.get_model(*CLAIM)
+    Questionnaire = apps.get_model(*QUESTS)
+    c_content_type = ContentType.objects.get_for_model(Claim)
+    q_content_type = ContentType.objects.get_for_model(Questionnaire)
     perm_read_app = Permission.objects.get(codename='read_claim',
-                                           content_type=app_content_type)
+                                           content_type=c_content_type)
     perm_add_app = Permission.objects.get(codename='add_claim',
-                                          content_type=app_content_type)
+                                          content_type=c_content_type)
     perm_read_ws = Permission.objects.get(codename='read_questionnaire',
-                                          content_type=ws_content_type)
+                                          content_type=q_content_type)
     perm_add_ws = Permission.objects.get(codename='add_questionnaire',
-                                         content_type=ws_content_type)
+                                         content_type=q_content_type)
     perm_change_ws = Permission.objects.get(codename='change_questionnaire',
-                                            content_type=ws_content_type)
+                                            content_type=q_content_type)
     g_credits = Group.objects.create(name=GROUP_CREDITS)
     g_credits.permissions.add(perm_read_app)
     g_credits.save()
@@ -74,8 +72,7 @@ def del_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('credits', '0002_model_offer'),
+        ('common', '0001_initial'),
         ('claims', '0001_initial'),
         ('questionnaires', '0001_initial'),
     ]

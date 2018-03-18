@@ -3,7 +3,8 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
-from apps.common.permissions import DjangoModelPermissionsWithRead
+from django.contrib.auth.models import User
+from apps.common.permissions import DjangoModelPermissionsWithRead, IsOwnerOrDjangoModelPermissions
 from .models import Worksheet
 from .serializers import WorksheetSerializer
 
@@ -53,4 +54,15 @@ class WorksheetViewSet(viewsets.ModelViewSet):
     # search_fields = ('surname', 'first_name', 'patronymic', 'phone_num')
     ordering = ('created', )
     filter_class = WorksheetFilter
-    permission_classes = (DjangoModelPermissionsWithRead, )
+    permission_classes = (IsOwnerOrDjangoModelPermissions, )
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user: User = self.request.user
+        if not user.has_perm('worksheets.read_worksheet'):
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        setattr(self, '_ignore_model_permissions', True)
+        return super().retrieve(request, *args, **kwargs)

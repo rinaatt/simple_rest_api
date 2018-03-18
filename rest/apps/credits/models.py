@@ -9,8 +9,8 @@ class Organization(models.Model):
     user = models.OneToOneField(User, models.CASCADE, null=True)
 
     class Meta:
-        verbose_name = 'Кредитная организация'
-        verbose_name_plural = 'Кредитные организации'
+        verbose_name = 'Оганизация'
+        verbose_name_plural = 'Организации'
 
     def __str__(self):
         return self.name

@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('common', '0001_initial'),
     ]
 
     operations = [
@@ -24,8 +23,8 @@ class Migration(migrations.Migration):
                 ('user', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'verbose_name': 'Кредитная организация',
-                'verbose_name_plural': 'Кредитные организации',
+                'verbose_name': 'Организация',
+                'verbose_name_plural': 'Организации',
             },
         ),
     ]

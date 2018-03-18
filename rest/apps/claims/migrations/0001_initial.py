@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Application',
+            name='Claim',
             fields=[
                 ('id', models.UUIDField(default=django.contrib.postgres.functions.RandomUUID(), editable=False, primary_key=True, serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='Создано')),

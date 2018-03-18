@@ -34,7 +34,7 @@ DEBUG: bool = env('DEBUG', cast=bool)
 ALLOWED_HOSTS: list = env('ALLOWED_HOSTS', cast=list, default=['*'])
 
 
-# Application definition
+# Claim definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'apps.common',
     'apps.questionnaires',
-    'apps.applications',
+    'apps.claims',
 ]
 
 MIDDLEWARE = [

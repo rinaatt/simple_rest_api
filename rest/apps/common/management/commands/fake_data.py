@@ -120,7 +120,7 @@ class Command(BaseCommand):
     OFFER = 'offer'
     QUESTIONNAIRE = 'questionnaire'
     USER = 'user'
-    APPLICATION = 'application'
+    APPLICATION = 'claim'
     generate_data = {
         ORGANIZATION: _generate_organization_data,
         OFFER: _generate_offer_data,

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ApplicationsConfig(AppConfig):
-    name = 'apps.applications'
+class ClaimsConfig(AppConfig):
+    name = 'apps.claims'
     verbose_name = 'Заявки'

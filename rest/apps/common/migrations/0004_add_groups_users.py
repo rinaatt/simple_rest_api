@@ -9,7 +9,7 @@ from apps.common.constants import GROUP_CREDITS, GROUP_PARTNERS
 
 def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [
-        ('applications', 'Application'),
+        ('claims', 'Claim'),
         ('questionnaires', 'Questionnaire')
     ]
     for app_name, model_name in app_model_list:
@@ -22,7 +22,7 @@ def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [
-        ('applications', 'Application'),
+        ('claims', 'Claim'),
         ('questionnaires', 'Questionnaire')
     ]
     for app_name, model_name in app_model_list:
@@ -38,13 +38,13 @@ def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 def add_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
-    Application = apps.get_model('applications', 'Application')
+    Claim = apps.get_model('claims', 'Claim')
     Questionnaire = apps.get_model('questionnaires', 'Questionnaire')
-    app_content_type = ContentType.objects.get_for_model(Application)
+    app_content_type = ContentType.objects.get_for_model(Claim)
     ws_content_type = ContentType.objects.get_for_model(Questionnaire)
-    perm_read_app = Permission.objects.get(codename='read_application',
+    perm_read_app = Permission.objects.get(codename='read_claim',
                                            content_type=app_content_type)
-    perm_add_app = Permission.objects.get(codename='add_application',
+    perm_add_app = Permission.objects.get(codename='add_claim',
                                           content_type=app_content_type)
     perm_read_ws = Permission.objects.get(codename='read_questionnaire',
                                           content_type=ws_content_type)
@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('common', '0003_model_offer'),
-        ('applications', '0001_initial'),
+        ('claims', '0001_initial'),
         ('questionnaires', '0001_initial'),
     ]
 

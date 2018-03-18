@@ -5,11 +5,11 @@ from apps.questionnaires.models import Questionnaire
 from apps.common.models import Offer
 
 __all__ = (
-    'Application',
+    'Claim',
 )
 
 
-class Application(models.Model):
+class Claim(models.Model):
     NEW = 'N'
     SENT = 'S'
     STATUS_CHOICES = (

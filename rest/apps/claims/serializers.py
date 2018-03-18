@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import Application
+from .models import Claim
 
 
-class ApplicationSerializer(serializers.HyperlinkedModelSerializer):
+class ClaimSerializer(serializers.HyperlinkedModelSerializer):
     offer = serializers.StringRelatedField()
     questionnaire = serializers.StringRelatedField()
 
     class Meta:
-        model = Application
+        model = Claim
         fields = ('url', 'created', 'sent', 'questionnaire', 'offer', 'status')
         read_only_fields = ('created', 'sent', 'status', )

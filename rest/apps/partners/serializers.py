@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from apps.questionnaires.models import Questionnaire
-from apps.claims.models import Claim
+from apps.credits.models import Claim
 
 
 class QuestionnaireSerializer(serializers.HyperlinkedModelSerializer):

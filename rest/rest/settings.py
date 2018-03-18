@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'apps.common',
     'apps.credits',
     'apps.questionnaires',
-    'apps.claims',
 ]
 
 MIDDLEWARE = [

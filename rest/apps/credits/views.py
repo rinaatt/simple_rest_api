@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.permissions import DjangoModelPermissions
-from apps.common.permissions import DjangoModelPermissionsWithRead
 from django.contrib.auth.models import User
 from .models import Claim
 from .serializers import ClaimSerializer

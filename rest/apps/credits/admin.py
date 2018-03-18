@@ -11,3 +11,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 class OfferAdmin(admin.ModelAdmin):
     list_display = ('created', 'name', )
     list_display_links = ('name', )
+
+
+@admin.register(m.Claim)
+class ClaimAdmin(admin.ModelAdmin):
+    pass

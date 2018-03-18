@@ -23,7 +23,7 @@ class QuestionnaireViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         user: User = self.request.user
         if not user.has_perm('questionnaires.read_questionnaire'):
-            queryset = queryset.filter(owner=self.request.user)
+            queryset = queryset.filter(organization=self.request.user.organization)
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
@@ -39,4 +39,4 @@ class ClaimViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(owner=self.request.user)
+        return queryset.filter(partner=self.request.user.organization)

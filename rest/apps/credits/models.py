@@ -3,6 +3,7 @@ from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
 from apps.partners.models import Questionnaire
 from apps.common.models import Organization as CommonOrganization
+from apps.partners.models import Organization as PartnerOrganization
 
 __all__ = [
     'Organization',
@@ -76,7 +77,8 @@ class Claim(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     created = models.DateTimeField('Создано', auto_now_add=True)
-    owner = models.ForeignKey(User, models.CASCADE, verbose_name='Создатель', null=True)
+    partner = models.ForeignKey(PartnerOrganization, models.CASCADE,
+                                verbose_name='Партнёрска организация', null=True)
     sent = models.DateTimeField('Отправлено', null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire, models.CASCADE, verbose_name='Анкета клиента')
     offer = models.ForeignKey(Offer, models.CASCADE, verbose_name='Предложение')

@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
-from apps.common.constants import GROUP_PARTNERS
 from . import models as m
 
 
@@ -14,21 +12,19 @@ class PartnerListFilter(admin.SimpleListFilter):
     parameter_name = 'partner'
 
     def lookups(self, request, model_admin):
-        partner_users = User.objects\
-            .filter(groups__name=GROUP_PARTNERS, organization__isnull=False)\
-            .values_list('pk', 'organization__name')
-        return tuple(partner_users)
+        partners = m.Organization.objects.values_list('pk', 'name')
+        return tuple(partners)
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(owner_id=self.value())
+            return queryset.filter(organization_id=self.value())
         return queryset
 
 
 @admin.register(m.Questionnaire)
 class QuestionnaireAdmin(admin.ModelAdmin):
     list_display = ('created', 'surname', 'first_name', 'patronymic',
-                    'phone_num', 'passport', 'owner')
+                    'phone_num', 'passport', 'organization')
     list_display_links = ('surname', 'first_name', 'patronymic', )
     list_filter = (PartnerListFilter, )
 

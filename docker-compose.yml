@@ -12,6 +12,7 @@ services:
   postgres:
     # restart: always
     image: postgres:10-alpine
+    container_name: postgres
     volumes:
       - db_django:/var/lib/postgresql/data
       - ./docker/postgres/opt:/var/opt
@@ -20,18 +21,21 @@ services:
       - net
     expose:
       - "5432"
+#    ports:
+#      - "5432:5432"
     env_file: .env
   redis:
     build:
       context: ./docker/redis
     networks:
       - net
-    hostname: redis
+    container_name: redis
     expose:
       - "6379"
   rest:
     build:
       context: ./docker/rest/
+    container_name: rest
     expose:
       - "8000"
     env_file:
@@ -46,17 +50,41 @@ services:
       - redis
       - postgres
     command: ./run.sh
+  rest_admin:
+    container_name: rest-admin
+    image: simplerestapi_rest
+    expose:
+      - "8000"
+    env_file:
+      - .env
+    working_dir: /var/rest
+    volumes:
+      - ./rest:/var/rest
+      - static:/var/rest/public/static
+    networks:
+      - net
+    depends_on:
+      - redis
+      - postgres
+      - rest
+    command: ./run_admin.sh
   nginx:
+    container_name: nginx
     domainname: "simple-rest.local"
     # restart: always
     build:
       context: ./docker/nginx/
+    expose:
+      - "8001"
+      - "8002"
     ports:
-      - "8001:80"
+      - "8001:8001"
+      - "8002:8002"
     volumes:
       - ./rest/public:/var/www:ro
       - static:/var/www/static:ro
     networks:
       - net
     depends_on:
+      - rest_admin
       - rest

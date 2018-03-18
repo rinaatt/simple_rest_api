@@ -5,7 +5,7 @@ map $status $loggable {
 
 server {
 
-    listen 8001;
+    listen 8002;
     server_name localhost;
     charset utf-8;
 
@@ -22,8 +22,8 @@ server {
     }
 
     location @rest_proxy {
-        proxy_pass                 http://rest:8000;
-        proxy_set_header           Host $host:8001;
+        proxy_pass                 http://rest-admin:8000;
+        proxy_set_header           Host $host:8002;
         proxy_set_header           X-Real-IP $remote_addr;
         proxy_set_header           X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_connect_timeout      60s;

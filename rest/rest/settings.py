@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'crispy_forms',
     'apps.common',
+    'apps.credits',
     'apps.questionnaires',
     'apps.claims',
 ]

@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('common', '0002_model_organization'),
+        ('credits', '0001_model_organization'),
     ]
 
     operations = [

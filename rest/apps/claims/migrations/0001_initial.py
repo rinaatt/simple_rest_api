@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('questionnaires', '0001_initial'),
-        ('common', '0003_model_offer'),
+        ('credits', '0002_model_offer'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

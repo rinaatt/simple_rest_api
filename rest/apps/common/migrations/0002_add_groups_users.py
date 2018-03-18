@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('common', '0003_model_offer'),
+        ('credits', '0002_model_offer'),
         ('claims', '0001_initial'),
         ('questionnaires', '0001_initial'),
     ]

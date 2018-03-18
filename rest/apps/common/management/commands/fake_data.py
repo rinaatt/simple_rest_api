@@ -7,11 +7,11 @@ from mimesis import Text, Datetime, Business, Person
 from mimesis.builtins import RussiaSpecProvider
 from mimesis.enums import Gender
 from mimesis.helpers import get_random_item
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Model
 from django.db import connection, transaction
 from django.contrib.auth.models import User, Group
-from apps.common.models import Organization, Offer
+from apps.credits.models import Organization, Offer
 from apps.common.constants import GROUP_PARTNERS, GROUP_CREDITS
 from apps.questionnaires.models import Questionnaire
 

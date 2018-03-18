@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
 from apps.questionnaires.models import Questionnaire
-from apps.common.models import Offer
+from apps.credits.models import Offer
 
 __all__ = (
     'Claim',

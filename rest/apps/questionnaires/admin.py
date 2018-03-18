@@ -20,8 +20,8 @@ class PartnerListFilter(admin.SimpleListFilter):
         return queryset
 
 
-@admin.register(m.Worksheet)
-class WorksheetAdmin(admin.ModelAdmin):
+@admin.register(m.Questionnaire)
+class QuestionnaireAdmin(admin.ModelAdmin):
     list_display = ('created', 'surname', 'first_name', 'patronymic',
                     'phone_num', 'passport', 'owner')
     list_display_links = ('surname', 'first_name', 'patronymic', )

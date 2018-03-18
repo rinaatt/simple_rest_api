@@ -13,7 +13,7 @@ from django.db import connection, transaction
 from django.contrib.auth.models import User, Group
 from apps.common.models import Organization, Offer
 from apps.common.constants import GROUP_PARTNERS, GROUP_CREDITS
-from apps.worksheets.models import Worksheet
+from apps.questionnaires.models import Questionnaire
 
 
 def _generate_offer_data(locale='ru') -> dict:
@@ -48,7 +48,7 @@ def _generate_organization_data(locale='ru') -> dict:
     }
 
 
-def _generate_worksheet_data(locale='ru') -> dict:
+def _generate_questionnaire_data(locale='ru') -> dict:
     person = Person(locale)
     rus_spec = RussiaSpecProvider()
     datetime = Datetime(locale)
@@ -108,35 +108,35 @@ class NoDataException(Exception):
 class Command(BaseCommand):
     help = """\
         Generate fake data, by default it generate for
-        models: [organization, offer, worksheet]
+        models: [organization, offer, questionnaire]
     """
     model = {
         'user': User,
         'organization': Organization,
         'offer': Offer,
-        'worksheet': Worksheet,
+        'questionnaire': Questionnaire,
     }
     ORGANIZATION = 'organization'
     OFFER = 'offer'
-    WORKSHEET = 'worksheet'
+    QUESTIONNAIRE = 'questionnaire'
     USER = 'user'
     APPLICATION = 'application'
     generate_data = {
         ORGANIZATION: _generate_organization_data,
         OFFER: _generate_offer_data,
-        WORKSHEET: _generate_worksheet_data,
+        QUESTIONNAIRE: _generate_questionnaire_data,
         USER: _generate_user_data,
     }
     default_count = {
         ORGANIZATION: 50,
         OFFER: 400,
-        WORKSHEET: 2000,
+        QUESTIONNAIRE: 2000,
     }
 
     def add_arguments(self, parser):
         parser.add_argument(
             'model', nargs='?', type=str, default='',
-            help='model name from list: organization, offer worksheet'
+            help='model name from list: organization, offer questionnaire'
         )
         parser.add_argument(
             '-c', '--count', action='store', dest='count', type=int,
@@ -154,7 +154,7 @@ class Command(BaseCommand):
             models_list = [self.USER,
                            self.ORGANIZATION,
                            self.OFFER,
-                           self.WORKSHEET]
+                           self.QUESTIONNAIRE]
         else:
             models_list = [model_name.lower()]
         for _name in models_list:
@@ -208,7 +208,7 @@ class Command(BaseCommand):
         ModelKlass.objects.all().delete()
         db_table = ModelKlass._meta.db_table
         organizations_id, users_id = [], []
-        if model_name in (self.APPLICATION, self.WORKSHEET):
+        if model_name in (self.APPLICATION, self.QUESTIONNAIRE):
             users_id = list(User.objects
                             .filter(groups__name=GROUP_PARTNERS)
                             .values_list('pk', flat=True))
@@ -226,7 +226,7 @@ class Command(BaseCommand):
             _data = self.generate_data[model_name](locale)
             if model_name == self.OFFER:
                 _data['organization_id'] = choice(organizations_id)
-            if model_name in (self.APPLICATION, self.WORKSHEET):
+            if model_name in (self.APPLICATION, self.QUESTIONNAIRE):
                 _data['owner_id'] = choice(users_id)
             elif model_name == self.ORGANIZATION:
                 _data['user_id'] = choice(users_id)

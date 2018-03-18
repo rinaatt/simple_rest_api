@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('worksheets', '0001_initial'),
+        ('questionnaires', '0001_initial'),
         ('common', '0003_model_offer'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(choices=[('N', 'Новая'), ('S', 'Отправленная')], default='N', max_length=1, verbose_name='Статус')),
                 ('offer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='common.Offer', verbose_name='Предложение')),
                 ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Создатель')),
-                ('worksheet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='worksheets.Worksheet', verbose_name='Анкета клиента')),
+                ('questionnaire', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='questionnaires.Questionnaire', verbose_name='Анкета клиента')),
             ],
             options={
                 'verbose_name': 'Заявка в кредитную организацию',

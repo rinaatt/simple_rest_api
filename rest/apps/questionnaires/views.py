@@ -4,14 +4,14 @@ from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django_filters import rest_framework as filters
 from django.contrib.auth.models import User
-from apps.common.permissions import DjangoModelPermissionsWithRead, IsOwnerOrDjangoModelPermissions
-from .models import Worksheet
-from .serializers import WorksheetSerializer
+from apps.common.permissions import IsOwnerOrDjangoModelPermissions
+from .models import Questionnaire
+from .serializers import QuestionnaireSerializer
 
 log = logging.getLogger('apps.common')
 
 
-class WorksheetFilter(filters.FilterSet):
+class QuestionnaireFilter(filters.FilterSet):
     min_created = filters.DateTimeFilter(name='created', lookup_expr='gte',
                                          label='Дата создания от')
     max_created = filters.DateTimeFilter(name='created', lookup_expr='lte',
@@ -42,24 +42,24 @@ class WorksheetFilter(filters.FilterSet):
     )
 
     class Meta:
-        model = Worksheet
+        model = Questionnaire
         fields = ('min_created', 'max_created',
                   'min_birth_date', 'max_birth_date',
                   'min_score', 'max_score', )
 
 
-class WorksheetViewSet(viewsets.ModelViewSet):
-    serializer_class = WorksheetSerializer
-    queryset = Worksheet.objects.all()
+class QuestionnaireViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionnaireSerializer
+    queryset = Questionnaire.objects.all()
     # search_fields = ('surname', 'first_name', 'patronymic', 'phone_num')
     ordering = ('created', )
-    filter_class = WorksheetFilter
+    filter_class = QuestionnaireFilter
     permission_classes = (IsOwnerOrDjangoModelPermissions, )
 
     def get_queryset(self):
         queryset = super().get_queryset()
         user: User = self.request.user
-        if not user.has_perm('worksheets.read_worksheet'):
+        if not user.has_perm('questionnaires.read_questionnaire'):
             queryset = queryset.filter(owner=self.request.user)
         return queryset
 

@@ -10,7 +10,7 @@ from apps.common.constants import GROUP_CREDITS, GROUP_PARTNERS
 def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [
         ('applications', 'Application'),
-        ('worksheets', 'Worksheet')
+        ('questionnaires', 'Questionnaire')
     ]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
@@ -23,7 +23,7 @@ def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [
         ('applications', 'Application'),
-        ('worksheets', 'Worksheet')
+        ('questionnaires', 'Questionnaire')
     ]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
@@ -39,23 +39,23 @@ def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 def add_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
     Application = apps.get_model('applications', 'Application')
-    Worksheet = apps.get_model('worksheets', 'Worksheet')
+    Questionnaire = apps.get_model('questionnaires', 'Questionnaire')
     app_content_type = ContentType.objects.get_for_model(Application)
-    ws_content_type = ContentType.objects.get_for_model(Worksheet)
+    ws_content_type = ContentType.objects.get_for_model(Questionnaire)
     perm_read_app = Permission.objects.get(codename='read_application',
                                            content_type=app_content_type)
     perm_add_app = Permission.objects.get(codename='add_application',
                                           content_type=app_content_type)
-    perm_read_ws = Permission.objects.get(codename='read_worksheet',
+    perm_read_ws = Permission.objects.get(codename='read_questionnaire',
                                           content_type=ws_content_type)
-    perm_add_ws = Permission.objects.get(codename='add_worksheet',
+    perm_add_ws = Permission.objects.get(codename='add_questionnaire',
                                          content_type=ws_content_type)
-    perm_change_ws = Permission.objects.get(codename='change_worksheet',
+    perm_change_ws = Permission.objects.get(codename='change_questionnaire',
                                             content_type=ws_content_type)
-    g_credits = Group.objects.create(name=CREDITS_G_NAME)
+    g_credits = Group.objects.create(name=GROUP_CREDITS)
     g_credits.permissions.add(perm_read_app)
     g_credits.save()
-    g_partners = Group.objects.create(name=PARTNERS_G_NAME)
+    g_partners = Group.objects.create(name=GROUP_PARTNERS)
     g_partners.permissions.add(perm_read_ws)
     g_partners.permissions.add(perm_add_ws)
     g_partners.permissions.add(perm_add_app)
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('common', '0003_model_offer'),
         ('applications', '0001_initial'),
-        ('worksheets', '0001_initial'),
+        ('questionnaires', '0001_initial'),
     ]
 
     operations = [

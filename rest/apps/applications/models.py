@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
-from apps.worksheets.models import Worksheet
+from apps.questionnaires.models import Questionnaire
 from apps.common.models import Offer
 
 __all__ = (
@@ -20,7 +20,7 @@ class Application(models.Model):
     created = models.DateTimeField('Создано', auto_now_add=True)
     owner = models.ForeignKey(User, models.CASCADE, verbose_name='Создатель', null=True)
     sent = models.DateTimeField('Отправлено', null=True, blank=True)
-    worksheet = models.ForeignKey(Worksheet, models.CASCADE, verbose_name='Анкета клиента')
+    questionnaire = models.ForeignKey(Questionnaire, models.CASCADE, verbose_name='Анкета клиента')
     offer = models.ForeignKey(Offer, models.CASCADE, verbose_name='Предложение')
     status = models.CharField('Статус', max_length=1, choices=STATUS_CHOICES, default=NEW)
 

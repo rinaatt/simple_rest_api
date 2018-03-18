@@ -3,7 +3,7 @@ from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
 
 
-class Worksheet(models.Model):
+class Questionnaire(models.Model):
     id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
     created = models.DateTimeField('Создано', auto_now_add=True)
     updated = models.DateTimeField('Изменено', auto_now=True)
@@ -18,8 +18,8 @@ class Worksheet(models.Model):
     owner = models.ForeignKey(User, models.CASCADE, verbose_name='Партнёр', null=True)
 
     class Meta:
-        verbose_name = 'Анкета клиента'
-        verbose_name_plural = 'Анкеты клиента'
+        verbose_name = 'Анкета'
+        verbose_name_plural = 'Анкеты'
 
     @property
     def full_name(self):

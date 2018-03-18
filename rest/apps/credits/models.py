@@ -89,4 +89,16 @@ class Claim(models.Model):
         verbose_name_plural = 'Заявки'
 
     def __str__(self):
-        return
+        return 'Заявка на "{}..."'.format(self.offer.name[:40])
+
+    @property
+    def questionnaire_display(self):
+        return str(self.questionnaire)
+
+    @property
+    def offer_dispaly(self):
+        return str(self.offer)
+
+    @property
+    def status_display(self):
+        return self.get_status_display()

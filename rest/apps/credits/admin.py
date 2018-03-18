@@ -15,4 +15,4 @@ class OfferAdmin(admin.ModelAdmin):
 
 @admin.register(m.Claim)
 class ClaimAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('__str__', 'created', 'partner', 'status', )

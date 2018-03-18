@@ -30,5 +30,5 @@ class IsOwnerOrDjangoModelPermissions(permissions.DjangoModelPermissions):
     }
 
     def has_object_permission(self, request, view, obj):
-        user = request.user
-        return user == getattr(obj, 'owner', None)
+        organization = getattr(request.user, 'organization', None)
+        return organization == getattr(obj, 'organization', None)

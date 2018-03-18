@@ -13,7 +13,7 @@ from django.db import connection, transaction
 from django.contrib.auth.models import User, Group
 from apps.credits.models import Organization, Offer
 from apps.common.constants import GROUP_PARTNERS, GROUP_CREDITS
-from apps.questionnaires.models import Questionnaire
+from apps.partners.models import Questionnaire
 
 
 def _generate_offer_data(locale='ru') -> dict:

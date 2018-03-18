@@ -4,14 +4,19 @@ from apps.common.constants import GROUP_PARTNERS
 from . import models as m
 
 
+@admin.register(m.Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', )
+
+
 class PartnerListFilter(admin.SimpleListFilter):
     title = 'Партнёр'
     parameter_name = 'partner'
 
     def lookups(self, request, model_admin):
         partner_users = User.objects\
-            .filter(groups__name=GROUP_PARTNERS)\
-            .values_list('pk', 'username')
+            .filter(groups__name=GROUP_PARTNERS, organization__isnull=False)\
+            .values_list('pk', 'organization__name')
         return tuple(partner_users)
 
     def queryset(self, request, queryset):

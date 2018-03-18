@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.questionnaires.models import Questionnaire
+from apps.partners.models import Questionnaire
 from apps.credits.models import Claim
 
 

@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'apps.common',
     'apps.credits',
-    'apps.questionnaires',
+    'apps.partners',
 ]
 
 MIDDLEWARE = [

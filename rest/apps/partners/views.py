@@ -4,7 +4,7 @@ from rest_framework.permissions import DjangoModelPermissions
 from django.contrib.auth.models import User
 from apps.common.permissions import IsOwnerOrDjangoModelPermissions
 from apps.credits.models import Claim
-from apps.questionnaires.models import Questionnaire
+from apps.partners.models import Questionnaire
 from .serializers import QuestionnaireSerializer, ClaimSerializer
 from .filters import QuestionnaireFilter
 

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import migrations
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.apps.registry import Apps
@@ -6,12 +5,23 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission, Group
 from apps.common.constants import GROUP_CREDITS, GROUP_PARTNERS
 
+CREDITS = 'credits'
+PARTNERS = 'partners'
+CLAIM = (CREDITS, 'Claim')
+QUESTS = (PARTNERS, 'Questionnaire')
 
-CLAIM = ('claims', 'Claim')
-QUESTS = ('questionnaires', 'Questionnaire')
+
+def add_all_permissions():
+    from django.apps import apps
+    from django.contrib.auth.management import create_permissions
+
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, verbosity=0)
+        app_config.models_module = None
 
 
-def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
+def add_read_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [CLAIM, QUESTS]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
@@ -21,7 +31,7 @@ def create_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
                                   content_type=content_type)
 
 
-def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
+def del_read_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
     app_model_list = [CLAIM, QUESTS]
     for app_name, model_name in app_model_list:
         ModelKlass = apps.get_model(app_name, model_name)
@@ -36,6 +46,7 @@ def remove_permissions(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 def add_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
+    add_all_permissions()
     Claim = apps.get_model(*CLAIM)
     Questionnaire = apps.get_model(*QUESTS)
     c_content_type = ContentType.objects.get_for_model(Claim)
@@ -70,14 +81,13 @@ def del_groups(apps: Apps, schema_editor: BaseDatabaseWrapper):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
-        ('common', '0001_initial'),
-        ('claims', '0001_initial'),
-        ('questionnaires', '0001_initial'),
+        ('common', '0003_require_other_apps'),
     ]
 
     operations = [
-        migrations.RunPython(create_permissions, reverse_code=remove_permissions),
+        migrations.RunPython(add_read_permissions, reverse_code=del_read_permissions),
         migrations.RunPython(add_groups, reverse_code=del_groups),
     ]

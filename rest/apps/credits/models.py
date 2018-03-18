@@ -1,20 +1,35 @@
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
-from apps.questionnaires.models import Questionnaire
+from apps.partners.models import Questionnaire
+from apps.common.models import Organization as CommonOrganization
+
+__all__ = [
+    'Organization',
+    'Offer',
+    'Claim',
+]
 
 
-class Organization(models.Model):
-    id = models.UUIDField(primary_key=True, default=RandomUUID(), editable=False)
-    name = models.CharField(max_length=200)
-    user = models.OneToOneField(User, models.CASCADE, null=True)
+class OrganizationManager(CommonOrganization.objects.__class__):
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(typ=CommonOrganization.CREDIT).order_by('name')
+
+
+class Organization(CommonOrganization):
+    objects = OrganizationManager()
 
     class Meta:
+        proxy = True
         verbose_name = 'Оганизация'
         verbose_name_plural = 'Организации'
 
-    def __str__(self):
-        return self.name
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.typ = CommonOrganization.CREDIT
+        return super().save(force_insert, force_update, using, update_fields)
 
 
 class Offer(models.Model):
@@ -73,10 +88,3 @@ class Claim(models.Model):
 
     def __str__(self):
         return
-
-
-__all__ = [
-    'Organization',
-    'Offer',
-    'Claim',
-]

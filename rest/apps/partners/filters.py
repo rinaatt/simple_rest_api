@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from apps.questionnaires.models import Questionnaire
+from apps.partners.models import Questionnaire
 
 
 class QuestionnaireFilter(filters.FilterSet):

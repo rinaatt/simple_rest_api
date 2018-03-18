@@ -1,6 +1,33 @@
 from django.db import models
 from django.contrib.postgres.functions import RandomUUID
 from django.contrib.auth.models import User
+from apps.common.models import Organization as CommonOrganization
+
+__all__ = [
+    'Organization',
+    'Questionnaire',
+]
+
+
+class OrganizationManager(CommonOrganization.objects.__class__):
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(typ=CommonOrganization.PARTNER).order_by('name')
+
+
+class Organization(CommonOrganization):
+    objects = OrganizationManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Оганизация'
+        verbose_name_plural = 'Организации'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.typ = CommonOrganization.PARTNER
+        return super().save(force_insert, force_update, using, update_fields)
 
 
 class Questionnaire(models.Model):

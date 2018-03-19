@@ -3,12 +3,14 @@ from rest_framework.permissions import DjangoModelPermissions
 from django.utils import timezone
 from .models import Claim
 from .serializers import ClaimSerializer
+from .filters import ClaimFilter
 
 
 class ClaimViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
     permission_classes = (DjangoModelPermissions, )
+    filter_class = ClaimFilter
 
     def retrieve(self, request, *args, **kwargs):
         claim: Claim = self.get_object()

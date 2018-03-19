@@ -61,7 +61,7 @@ class Offer(models.Model):
         verbose_name_plural = 'Предложения'
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.organization)
 
     @property
     def type(self):

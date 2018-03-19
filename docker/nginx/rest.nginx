@@ -30,11 +30,11 @@ server {
         proxy_send_timeout         60s;
         proxy_read_timeout         1h;
         proxy_buffering            on;
-        proxy_buffer_size          1k;
-        proxy_buffers              24 4k;
-        proxy_busy_buffers_size    8k;
+        proxy_buffer_size          64k;
+        proxy_buffers              8 64k;
+        proxy_busy_buffers_size    64k;
         proxy_max_temp_file_size   2048m;
-        proxy_temp_file_write_size 32k;
+        proxy_temp_file_write_size 64k;
     }
 
 }

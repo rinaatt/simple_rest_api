@@ -11,6 +11,11 @@ class QuestionnaireSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'created', 'updated', 'surname', 'first_name',
                   'patronymic', 'birth_date', 'phone_num', 'passport',
                   'score')
+        extra_kwargs = {
+            'url': {
+                'view_name': 'partner-questionnaire-detail'
+            }
+        }
 
 
 class QuestionnaireRelatedField(serializers.PrimaryKeyRelatedField):

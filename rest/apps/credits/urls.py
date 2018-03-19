@@ -1,10 +1,11 @@
 from django.urls import include, path
 from rest_framework import routers
-from apps.credits.views import ClaimViewSet
+from .views import ClaimViewSet
 
-router = routers.DefaultRouter()
-router.register(r'claims', ClaimViewSet)
+
+credits_router = routers.DefaultRouter()
+credits_router.register(r'claims', ClaimViewSet, base_name='credits_claim')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(credits_router.urls)),
 ]

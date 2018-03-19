@@ -2,10 +2,12 @@ from django.urls import include, path
 from rest_framework import routers
 from .views import QuestionnaireViewSet, ClaimViewSet
 
-router = routers.DefaultRouter()
-router.register(r'questionnaires', QuestionnaireViewSet)
-router.register(r'claims', ClaimViewSet)
+
+partners_router = routers.DefaultRouter()
+partners_router.register(r'questionnaires', QuestionnaireViewSet,
+                         base_name='partner-questionnaire')
+partners_router.register(r'claims', ClaimViewSet, base_name='partner-claim')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(partners_router.urls)),
 ]

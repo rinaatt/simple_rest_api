@@ -1,7 +1,6 @@
 import logging
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import DjangoModelPermissions
-from django.contrib.auth.models import User
 from apps.common.permissions import IsOwnerOrDjangoModelPermissions
 from apps.credits.models import Claim
 from apps.partners.models import Questionnaire
@@ -20,13 +19,8 @@ class QuestionnaireViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        # user: User = self.request.user
         queryset = queryset.filter(organization=self.request.user.organization)
         return queryset
-
-    # def retrieve(self, request, *args, **kwargs):
-    #     setattr(self, '_ignore_model_permissions', True)
-    #     return super().retrieve(request, *args, **kwargs)
 
 
 class ClaimViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,

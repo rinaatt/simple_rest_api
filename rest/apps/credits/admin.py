@@ -4,7 +4,7 @@ from apps.credits import models as m
 
 @admin.register(m.Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('__str__', 'user')
 
 
 @admin.register(m.Offer)

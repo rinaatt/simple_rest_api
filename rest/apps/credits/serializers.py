@@ -8,5 +8,6 @@ class ClaimSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Claim
-        fields = ('url', 'created', 'sent', 'questionnaire', 'offer', 'status')
-        read_only_fields = ('created', 'sent', 'status', )
+        fields = ('url', 'created', 'sent', 'questionnaire', 'offer',
+                  'status_display')
+        read_only_fields = ('sent', 'status_display', )

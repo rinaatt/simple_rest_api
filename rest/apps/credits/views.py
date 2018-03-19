@@ -1,18 +1,26 @@
 from rest_framework import viewsets
 from rest_framework.permissions import DjangoModelPermissions
-from django.contrib.auth.models import User
+from django.utils import timezone
 from .models import Claim
 from .serializers import ClaimSerializer
 
 
-class ClaimViewSet(viewsets.ModelViewSet):
+class ClaimViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
     permission_classes = (DjangoModelPermissions, )
 
+    def retrieve(self, request, *args, **kwargs):
+        claim: Claim = self.get_object()
+        if claim.sent is None:
+            claim.sent = timezone.now()
+            claim.status = Claim.SENT
+            claim.save()
+        return super().retrieve(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        user: User = self.request.user
-        if not user.has_perm('claims.read_claim'):
-            queryset = queryset.filter(owner=self.request.user)
+        organization = getattr(self.request.user, 'organization', None)
+        if organization is not None:
+            queryset = queryset.filter(offer__organization=organization)
         return queryset

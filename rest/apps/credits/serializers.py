@@ -11,3 +11,9 @@ class ClaimSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'created', 'sent', 'questionnaire', 'offer',
                   'status_display')
         read_only_fields = ('sent', 'status_display', )
+        extra_kwargs = {
+            'url': {
+                'view_name': 'credit-claim-detail'
+            }
+        }
+

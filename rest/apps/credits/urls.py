@@ -4,7 +4,7 @@ from .views import ClaimViewSet
 
 
 credits_router = routers.DefaultRouter()
-credits_router.register(r'claims', ClaimViewSet, base_name='credits_claim')
+credits_router.register(r'claims', ClaimViewSet, base_name='credit-claim')
 
 urlpatterns = [
     path('', include(credits_router.urls)),
